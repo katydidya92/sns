@@ -4,9 +4,9 @@ import com.fastcampus.project.sns.model.entity.UserEntity;
 
 public class UserEntityFixture {
 
-    public static UserEntity get(String userName, String password) {
+    public static UserEntity get(String userName, String password, Integer userId) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(1);
+        userEntity.setId(userId);
         userEntity.setUserName(userName);
         userEntity.setPassword(password);
 

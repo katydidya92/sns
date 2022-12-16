@@ -35,8 +35,8 @@ public class PostEntity {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @Column(name = "removed_at")
-    private Timestamp removedAt;
+    @Column(name = "deleted_at")
+    private Timestamp deletedAt;
 
 
     @PrePersist
