@@ -121,4 +121,54 @@ public class PostServiceTest {
 
     }
 
+    @Test
+    void 포스트삭제가_성공한경우() {
+
+        String userName = "userName";
+        Integer postId = 3;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        Assertions.assertDoesNotThrow(() -> postService.delete(userName, postId));
+
+    }
+
+    @Test
+    void 포스트삭제시_포스트가존재하지않는경우() throws Exception {
+
+        String userName = "test01";
+        Integer postId = 1;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 1);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
+
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.delete(userName, 1));
+        Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+
+    }
+
+    @Test
+    void 포스트삭제시_권한이없는경우() throws Exception {
+
+        String userName = "test01";
+        Integer postId = 1;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 1);
+        UserEntity writer = UserEntityFixture.get("test03", "test", 1);
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(writer));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.delete(userName, 1));
+        Assertions.assertEquals(ErrorCode.INVALID_PSERMISSION, e.getErrorCode());
+
+    }
+
 }
