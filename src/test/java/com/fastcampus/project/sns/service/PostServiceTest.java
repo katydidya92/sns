@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -61,7 +63,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 포스트수정이_성공한경우() throws Exception {
+    void 포스트수정이_성공한경우() {
 
         String title = "title";
         String body = "body";
@@ -80,7 +82,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 포스트수정시_포스트가존재하지않는경우() throws Exception {
+    void 포스트수정시_포스트가존재하지않는경우() {
 
         String title = "title";
         String body = "body";
@@ -101,7 +103,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 포스트수정시_권한이없는경우() throws Exception {
+    void 포스트수정시_권한이없는경우() {
 
         String title = "title";
         String body = "body";
@@ -138,7 +140,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 포스트삭제시_포스트가존재하지않는경우() throws Exception {
+    void 포스트삭제시_포스트가존재하지않는경우() {
 
         String userName = "test01";
         Integer postId = 1;
@@ -155,7 +157,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 포스트삭제시_권한이없는경우() throws Exception {
+    void 포스트삭제시_권한이없는경우() {
 
         String userName = "test01";
         Integer postId = 1;
@@ -170,5 +172,23 @@ public class PostServiceTest {
         Assertions.assertEquals(ErrorCode.INVALID_PSERMISSION, e.getErrorCode());
 
     }
+
+    @Test
+    void 피드목록이_성공한경우() {
+
+        Pageable pageable = mock(Pageable.class);
+        when(postEntityRepository.findAll(pageable)).thenReturn(Page.empty());
+        Assertions.assertDoesNotThrow(() -> postService.list(pageable));
+    }
+
+    @Test
+    void 내피드목록요청이_성공한경우() {
+        Pageable pageable = mock(Pageable.class);
+        UserEntity user = mock(UserEntity.class);
+        when(userEntityRepository.findByUserName(any())).thenReturn(Optional.of(user));
+        when(postEntityRepository.findAllByUser(user, pageable)).thenReturn(Page.empty());
+        Assertions.assertDoesNotThrow(() -> postService.my("", pageable));
+    }
+
 
 }
