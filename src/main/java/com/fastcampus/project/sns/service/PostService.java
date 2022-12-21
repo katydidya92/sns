@@ -63,6 +63,8 @@ public class PostService {
             throw new SnsApplicationException(ErrorCode.INVALID_PSERMISSION, String.format("%s has no permission with %s", userName, postId));
         }
 
+        likeEntityRepository.deleteAllByPost(postEntity);
+        commentEntityRepository.deleteAllByPost(postEntity);
         postEntityRepository.delete(postEntity);
 
     }
@@ -95,9 +97,17 @@ public class PostService {
                 });
         // like save
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
+
+        alarmEntityRepository.save(
+                AlarmEntity.of(
+                        postEntity.getUser(),
+                        AlarmType.NEW_LIKE_ON_POST,
+                        new AlarmArgs(userEntity.getId(), postEntity.getId())
+                )
+        );
     }
 
-    public int likeCount(Integer postId) {
+    public long likeCount(Integer postId) {
 
         // post exist
         PostEntity postEntity = getPostEntityOrException(postId);

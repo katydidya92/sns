@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AlarmEntityRepository extends JpaRepository<AlarmEntity, Integer> {
 
-    Page<AlarmEntity> findAllByUser(UserEntity user, Pageable pageable);
+    // user 호출을 위해 DB로 부터 2번 가져오기 때문에 변경
+    // Page<AlarmEntity> findAllByUser(UserEntity user, Pageable pageable);
+    Page<AlarmEntity> findAllByUserId(Integer userId, Pageable pageable);
 }
