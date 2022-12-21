@@ -27,7 +27,6 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/*/users/join", "/api/*/users/login").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .and()
                 .sessionManagement()
@@ -43,6 +42,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring()
                 .regexMatchers("^(?!/api/).*")
+                .antMatchers("/api/*/users/join", "/api/*/users/login")
         ;
     }
 }

@@ -1,8 +1,11 @@
 package com.fastcampus.project.sns.model;
 
 import com.fastcampus.project.sns.model.entity.UserEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,12 +14,14 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 @AllArgsConstructor
 public class User implements UserDetails {
 
     private Integer id;
-    private String userName;
+    private String username;
     private String password;
     private UserRole userRole;
     private Timestamp registerAt;
@@ -35,31 +40,37 @@ public class User implements UserDetails {
         );
     }
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.getUserRole().toString()));
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
-        return this.userName;
+        return this.username;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return this.deletedAt == null;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return this.deletedAt == null;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return this.deletedAt == null;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return this.deletedAt == null;
