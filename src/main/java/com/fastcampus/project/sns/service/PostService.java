@@ -2,16 +2,12 @@ package com.fastcampus.project.sns.service;
 
 import com.fastcampus.project.sns.exception.ErrorCode;
 import com.fastcampus.project.sns.exception.SnsApplicationException;
+import com.fastcampus.project.sns.model.AlarmArgs;
+import com.fastcampus.project.sns.model.AlarmType;
 import com.fastcampus.project.sns.model.Comment;
 import com.fastcampus.project.sns.model.Post;
-import com.fastcampus.project.sns.model.entity.CommentEntity;
-import com.fastcampus.project.sns.model.entity.LikeEntity;
-import com.fastcampus.project.sns.model.entity.PostEntity;
-import com.fastcampus.project.sns.model.entity.UserEntity;
-import com.fastcampus.project.sns.repository.CommentEntityRepository;
-import com.fastcampus.project.sns.repository.LikeEntityRepository;
-import com.fastcampus.project.sns.repository.PostEntityRepository;
-import com.fastcampus.project.sns.repository.UserEntityRepository;
+import com.fastcampus.project.sns.model.entity.*;
+import com.fastcampus.project.sns.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +23,7 @@ public class PostService {
     private final UserEntityRepository userEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
+    private final AlarmEntityRepository alarmEntityRepository;
 
     @Transactional
     public void create(String title, String body, String userName) {
@@ -122,13 +119,22 @@ public class PostService {
 
         // comment save
         commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
+
+        // comment가 달린 post 작성자는 postEntity.getUser()이고,
+        // 해당 포스트에 comment 작성자는 userEntity.getId()이다.
+        alarmEntityRepository.save(
+                AlarmEntity.of(
+                        postEntity.getUser(),
+                        AlarmType.NEW_COMMENT_ON_POST,
+                        new AlarmArgs(userEntity.getId(), postEntity.getId())
+                )
+        );
     }
 
     public Page<Comment> getComments(Integer postId, Pageable pageable) {
         PostEntity postEntity = getPostEntityOrException(postId);
         return commentEntityRepository.findAllByPost(postEntity, pageable)
                 .map(Comment::fromEntity);
-
     }
 
     private PostEntity getPostEntityOrException(Integer postId) {
