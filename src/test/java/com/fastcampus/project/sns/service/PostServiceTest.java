@@ -190,5 +190,38 @@ public class PostServiceTest {
         Assertions.assertDoesNotThrow(() -> postService.my("", pageable));
     }
 
+    @Test
+    void 좋아요요청이_성공한경우() {
+
+        String userName = "userName";
+        Integer postId = 3;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        Assertions.assertDoesNotThrow(() -> postService.like(postId, userName));
+    }
+
+    @Test
+    void 좋아요요청시_포스트가존재하지않는경우() {
+
+        String userName = "userName";
+        Integer postId = 11;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
+
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
+                () -> postService.delete(userName, postId));
+        Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+
+    }
+
 
 }
