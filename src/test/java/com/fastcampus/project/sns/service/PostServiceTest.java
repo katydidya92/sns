@@ -190,11 +190,12 @@ public class PostServiceTest {
         Assertions.assertDoesNotThrow(() -> postService.my("", pageable));
     }
 
+    // TODO : 해당 테스트는 여러 번 할 경우 에러가 발생함 -> 해당 테스트틀 여러 번 해도 문제가 되지 않을 방법을 추가적으로 찾아볼 것
     @Test
     void 좋아요요청이_성공한경우() {
 
         String userName = "userName";
-        Integer postId = 3;
+        Integer postId = 5;
 
         PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
         UserEntity userEntity = postEntity.getUser();
@@ -218,10 +219,64 @@ public class PostServiceTest {
         when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
 
         SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
-                () -> postService.delete(userName, postId));
+                () -> postService.like(postId, userName));
         Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
 
     }
+
+    @Test
+    void 좋아요요청시_이미좋아요를누른경우() {
+
+        String userName = "userName";
+        Integer postId = 5;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,
+                () -> postService.like(postId, userName));
+        Assertions.assertEquals(ErrorCode.ALREADY_LIKED, e.getErrorCode());
+
+    }
+
+    @Test
+    void 댓글요청이_성공한경우() {
+
+        String userName = "userName";
+        Integer postId = 3;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        Assertions.assertDoesNotThrow(() -> postService.comment(postId, userName, "comment"));
+    }
+
+    @Test
+    void 댓글요청시_포스트가존재하지않는경우() {
+
+        String userName = "userName";
+        Integer postId = 3;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, 2);
+        UserEntity userEntity = postEntity.getUser();
+        Pageable pageable = mock(Pageable.class);
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findAll(pageable)).thenReturn(Page.empty());
+
+        SnsApplicationException e = Assertions.assertThrows(
+                SnsApplicationException.class, () -> postService.getComments(postId, pageable)
+        );
+        Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+
+    }
+
 
 
 }

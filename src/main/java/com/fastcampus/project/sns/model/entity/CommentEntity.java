@@ -9,13 +9,15 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-@Where(clause = "deleted_at is NULL")
-@SQLDelete(sql = "UPDATE \"like\" SET deleted_at = now() where id = ?")
+@SQLDelete(sql = "UPDATE \"comment\" SET deleted_at = now() where id = ?")
 @Setter
 @Getter
-@Table(name = "\"like\"")
+@Table(name = "\"comment\"", indexes = {
+        @Index(name = "post_id_idx", columnList = "post_id")
+})
+@Where(clause = "deleted_at is NULL")
 @Entity
-public class LikeEntity {
+public class CommentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +30,9 @@ public class LikeEntity {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private PostEntity post;
+
+    @Column(name = "comment")
+    private String comment;
 
     @Column(name = "registered_at")
     private Timestamp registeredAt;
@@ -49,10 +54,13 @@ public class LikeEntity {
         this.updatedAt = Timestamp.from(Instant.now());
     }
 
-    public static LikeEntity of(UserEntity user, PostEntity postEntity) {
-        LikeEntity entity = new LikeEntity();
+    public static CommentEntity of(UserEntity user, PostEntity postEntity, String comment) {
+        CommentEntity entity = new CommentEntity();
         entity.setUser(user);
         entity.setPost(postEntity);
+        entity.setComment(comment);
         return entity;
     }
 }
+
+
