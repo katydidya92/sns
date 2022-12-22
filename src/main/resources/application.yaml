@@ -19,3 +19,25 @@ jwt:
   token.expired-time-ms: 2592000000
 
 spring.redis.url: redis://:pc3a1c3c58438ebccd080b12eaf6f2d5779fcc7ecdb725aad699f2466b50f3a0e@ec2-3-216-87-147.compute-1.amazonaws.com:19649
+spring:
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-256
+      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="fdgyluxu" password="9y9ZfNcHYo5Moa0UD_xX7-CTFszmXo0J";
+    consumer:
+      properties.spring.json.trusted.packages: "*"
+      bootstrap-servers: dory-01.srvs.cloudkafka.com:9094, dory-02.srvs.cloudkafka.com:9094, dory-03.srvs.cloudkafka.com:9094
+      group-id: alarm
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    listener:
+      ack-mode: manual
+    producer:
+      bootstrap-servers: dory-01.srvs.cloudkafka.com:9094, dory-02.srvs.cloudkafka.com:9094, dory-03.srvs.cloudkafka.com:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties.enable.idempotence: false
+    topic:
+      alarm: fdgyluxu-alarm
