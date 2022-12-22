@@ -119,7 +119,7 @@ public class PostServiceTest {
                 .thenReturn(Optional.of(postEntity));
 
         SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.modify(title, body, userName, postId));
-        Assertions.assertEquals(ErrorCode.INVALID_PSERMISSION, e.getErrorCode());
+        Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 
     }
 
@@ -169,7 +169,7 @@ public class PostServiceTest {
         when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
 
         SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class, () -> postService.delete(userName, 1));
-        Assertions.assertEquals(ErrorCode.INVALID_PSERMISSION, e.getErrorCode());
+        Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
 
     }
 

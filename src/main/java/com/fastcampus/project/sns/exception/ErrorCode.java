@@ -14,8 +14,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR"),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurs in database"),
+    ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting alarm occurs error "),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not founded"),
-    INVALID_PSERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
+    INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid"),
     ALREADY_LIKED(HttpStatus.CONFLICT, "User already liked the post"),
 
     ;

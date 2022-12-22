@@ -107,7 +107,7 @@ public class PostControllerTest {
         String title = "title";
         String body = "body";
 
-        doThrow(new SnsApplicationException(ErrorCode.INVALID_PSERMISSION))
+        doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION))
                 .when(postService).modify(eq(title), eq(body), any(), eq(1));
 
         mockMvc.perform(put("/api/v1/posts")
@@ -159,7 +159,7 @@ public class PostControllerTest {
     void 포스트삭제시_작성자와_삭제요청자가_다를경우() throws Exception {
 
         //mocking
-        doThrow(new SnsApplicationException(ErrorCode.INVALID_PSERMISSION))
+        doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION))
                 .when(postService).delete(any(), any());
 
         mockMvc.perform(delete("/api/v1/posts/1")

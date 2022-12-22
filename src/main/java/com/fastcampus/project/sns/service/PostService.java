@@ -24,6 +24,7 @@ public class PostService {
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
     private final AlarmEntityRepository alarmEntityRepository;
+    private final AlarmService alarmService;
 
     @Transactional
     public void create(String title, String body, String userName) {
@@ -42,7 +43,7 @@ public class PostService {
 
         // post permission
         if (postEntity.getUser() != userEntity) {
-            throw new SnsApplicationException(ErrorCode.INVALID_PSERMISSION, String.format("%s has no permission with %s", userName, postId));
+            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", userName, postId));
         }
 
         postEntity.setTitle(title);
@@ -60,7 +61,7 @@ public class PostService {
 
         // post permission
         if (postEntity.getUser() != userEntity) {
-            throw new SnsApplicationException(ErrorCode.INVALID_PSERMISSION, String.format("%s has no permission with %s", userName, postId));
+            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission with %s", userName, postId));
         }
 
         likeEntityRepository.deleteAllByPost(postEntity);
@@ -98,13 +99,15 @@ public class PostService {
         // like save
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
 
-        alarmEntityRepository.save(
+        AlarmEntity alarmEntity = alarmEntityRepository.save(
                 AlarmEntity.of(
                         postEntity.getUser(),
                         AlarmType.NEW_LIKE_ON_POST,
                         new AlarmArgs(userEntity.getId(), postEntity.getId())
                 )
         );
+
+        alarmService.send(alarmEntity.getId(), postEntity.getUser().getId());
     }
 
     public long likeCount(Integer postId) {
@@ -132,13 +135,15 @@ public class PostService {
 
         // comment가 달린 post 작성자는 postEntity.getUser()이고,
         // 해당 포스트에 comment 작성자는 userEntity.getId()이다.
-        alarmEntityRepository.save(
+        AlarmEntity alarmEntity = alarmEntityRepository.save(
                 AlarmEntity.of(
                         postEntity.getUser(),
                         AlarmType.NEW_COMMENT_ON_POST,
                         new AlarmArgs(userEntity.getId(), postEntity.getId())
                 )
         );
+
+        alarmService.send(alarmEntity.getId(), postEntity.getUser().getId());
     }
 
     public Page<Comment> getComments(Integer postId, Pageable pageable) {
